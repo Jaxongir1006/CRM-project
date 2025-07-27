@@ -1,0 +1,9 @@
+from ninja_extra import NinjaExtraAPI
+from users.controller import UserController
+from customers.controller import CustomerController
+from interaction.controller import InteractionController
+from lead.controller import LeadController,DealController, StatisticsController
+
+api = NinjaExtraAPI(docs_url="/swagger/", openapi_url="/openapi.json")
+
+api.register_controllers(UserController, CustomerController, InteractionController, LeadController, DealController, StatisticsController)
