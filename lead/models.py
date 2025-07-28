@@ -1,6 +1,6 @@
 from django.db import models
 from utils.models import TimeStampedModel
-
+from ninja.errors import ValidationError
 
 class Lead(TimeStampedModel):
     class StatusEnum(models.TextChoices):
@@ -10,7 +10,6 @@ class Lead(TimeStampedModel):
         LOST = "lost", "Lost"
         CONVERTED = "converted", "Converted"
 
-    customer = models.OneToOneField("customers.Customer", on_delete=models.SET_NULL, null=True, blank=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -18,12 +17,22 @@ class Lead(TimeStampedModel):
     status = models.CharField(max_length=20, choices=StatusEnum.choices, default=StatusEnum.NEW)
     created_by = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["phone", "created_by"],
+                name="unique_lead_by_phone_and_creator"
+            )
+        ]
 
     def __str__(self):
         return f"{self.full_name} - {self.status}"
     
-    class Meta:
-        ordering = ["-created_at"]
+    def clean(self):
+        if Lead.objects.exclude(id=self.id).filter(phone=self.phone, created_by=self.created_by).exists():
+            raise ValidationError("This lead already exists for this user.")
+
 
 
 class Deal(TimeStampedModel):

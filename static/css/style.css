@@ -1,0 +1,15 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  table-layout: fixed; /* kerak */
+}
+
+th, td {
+  padding: 10px 8px;
+  border: 1px solid #ccc;
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-word;
+  vertical-align: top; /* Yangi qo‘shiladi */
+}

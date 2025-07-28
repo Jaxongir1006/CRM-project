@@ -24,7 +24,6 @@ class MeetingSchema(ModelSchema):
 class CreateTaskSchema(Schema):
     title: str
     deadline: str
-    assignee: Optional[int] = None
     description: Optional[str] = None
     status: Optional[str] = "todo"
 
@@ -34,3 +33,17 @@ class CreateMeetingSchema(Schema):
     datetime: str
     purpose: str
     location: Optional[str]
+
+
+class UpdateTaskSchema(Schema):
+    title: Optional[str] = None
+    deadline: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = "todo"    
+
+
+class UpdateMeetingSchema(Schema):
+    customer: Optional[int] = None
+    datetime: Optional[str] = None
+    purpose: Optional[str] = None
+    location: Optional[str] = None

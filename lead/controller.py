@@ -14,9 +14,13 @@ from .schemas import (
 )
 from typing import List
 from ninja_extra.permissions import IsAuthenticated
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from weasyprint import HTML
+from io import BytesIO
+import datetime
 
-
-@api_controller('/lead', tags=['Lead'], auth=JWTAuth(), permissions=[IsAuthenticated])
+@api_controller('/lead', tags=['Lead'])
 class LeadController:
     @http_get(
         "/",
@@ -75,6 +79,20 @@ class LeadController:
 
         return 200, {"message":"The lead has been deleted"}
 
+    @http_get('/export/pdf/', response=dict)
+    def lead_export_pdf(self, request):
+        leads = Lead.objects.all()
+        html_string = render_to_string("lead_pdf.html", {
+            "leads": leads,
+            "today": datetime.date.today(),
+        })
+
+        pdf_file = BytesIO()
+        HTML(string=html_string).write_pdf(pdf_file)
+
+        response = HttpResponse(pdf_file.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="leads.pdf"'
+        return response
 
 @api_controller("/deals", auth=JWTAuth(), tags=['Deal'], permissions=[IsAuthenticated])
 class DealController:

@@ -70,11 +70,11 @@ class CustomerController:
 
         if request.user.role == "admin":
             customer.delete()
-            return 200, {"message": "The user has been deleted permanently"}
+            return 200, {"message": "The customer has been deleted permanently"}
 
         if customer.status == Customer.StatusEnum.CLOSED:
-            return 200, {"message": "This user's status is already 'closed'"}
+            return 200, {"message": "This customer's status is already 'closed'"}
 
         return 200, {
-            "message": "The user's status has been changed to 'closed'\nIf you want to delete the user permanently ask the admin"
+            "message": "The customer's status has been changed to 'closed'\nIf you want to delete the customer permanently ask the admin"
         }

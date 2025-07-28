@@ -45,7 +45,7 @@ class CreateDealSchema(Schema):
 
 
 class UpdateDealSchema(Schema):
-    status: Optional[str] = "active"
+    status: Optional[str] = "open"
     amount: Optional[float] = None
     close_date: Optional[str] = None
 

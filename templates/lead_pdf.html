@@ -1,0 +1,26 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<img src="{% static 'images/logo.png' %}" alt="CRM Logo">
+<table>
+  <thead>
+    <tr>
+      <th style="width: 5%;">#</th>
+      <th style="width: 20%;">Full Name</th>
+      <th style="width: 35%;">Email</th>
+      <th style="width: 25%;">Phone</th>
+      <th style="width: 15%;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lead in leads %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td style="word-break: break-word;">{{ lead.full_name }}</td>
+        <td style="word-break: break-word;">{{ lead.email }}</td>
+        <td style="word-break: break-word;">{{ lead.phone }}</td>
+        <td class="status-{{ lead.status|lower }}">{{ lead.status|title }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
