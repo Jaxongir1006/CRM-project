@@ -10,7 +10,6 @@ from ninja_jwt.tokens import RefreshToken
 from ninja_extra.permissions import IsAuthenticated
 from ninja_jwt.authentication import JWTAuth
 from utils.permissions import IsAdmin
-import jazzmin
 
 @api_controller("/user", tags=["Register and Login"])
 class UserController:
@@ -32,7 +31,6 @@ class UserController:
             user = CustomUser.objects.create_user(**data)
         except Exception as e:
             return 400, {"error": str(e)}
-        token = RefreshToken.for_user(user)
 
         return 201, {
             "message": "New user created",
