@@ -20,7 +20,7 @@ from weasyprint import HTML
 from io import BytesIO
 import datetime
 
-@api_controller('/lead', tags=['Lead'])
+@api_controller('/lead', tags=['Lead'], auth=JWTAuth(), permissions=[IsAuthenticated])
 class LeadController:
     @http_get(
         "/",
@@ -98,11 +98,12 @@ class LeadController:
 class DealController:
     @http_post("/create/", response={201: DealSchema, 400: ErrorSchema}, permissions=[IsAdminManagerSales])
     def create_deal(self, request, data: CreateDealSchema):
-        lead = Lead.objects.get(id=data.lead)
+        try:
+            lead = Lead.objects.get(id=data.lead)
+        except Lead.DoesNotExist:
+            return 400, {"error":"Lead not found"}
         if lead.status == Lead.StatusEnum.LOST:
             return 400, {"error":"The lead has been lost"}
-        if not lead:
-            return 400, {"error":"Lead not found"}
         data = data.model_dump(exclude_unset=True)
         data['lead'] = lead
         try:

@@ -26,7 +26,6 @@ class TaskController:
     def create_task(self, request, data: CreateTaskSchema):
         user = request.user
         data = data.model_dump(exclude_unset=True)
-        data.pop("assignee")
         data["assignee"] = user
         try:
             task = Task.objects.create(**data)
@@ -86,7 +85,7 @@ class MeetingController:
         response={201: MeetingSchema, 400: ErrorSchema},
         permissions=[IsAdminManagerSales],
     )
-    def create_task(self, request, data: CreateMeetingSchema):
+    def create_meeting(self, request, data: CreateMeetingSchema):
         customer = Customer.objects.filter(id=data.customer).first()
         if not customer:
             return 400, {"error": "Customer not found"}
@@ -97,6 +96,7 @@ class MeetingController:
             meeting = Meeting.objects.create(**data)
         except Exception as e:
             return 400, {"error", str(e)}
+        return 201, meeting
 
     @http_get("/", response=List[MeetingSchema])
     def get_meetings(self, request):

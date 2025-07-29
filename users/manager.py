@@ -12,16 +12,16 @@ class CustomUserManager(BaseUserManager):
         
         email = self.normalize_email(email)
 
-        # if password is None:
-        #     raise ValueError('The password must be set')
-        # if len(password) < 8:
-        #     raise ValueError('The password must be at least 8 characters long')
-        # if len(password) > 16:
-        #     raise ValueError('The password must be at most 16 characters long')
-        # if password.isalpha():
-        #     raise ValueError('The password must contain at least one number')
-        # if password.isnumeric():
-        #     raise ValueError('The password must contain at least one letter')
+        if password is None:
+            raise ValueError('The password must be set')
+        if len(password) < 8:
+            raise ValueError('The password must be at least 8 characters long')
+        if len(password) > 16:
+            raise ValueError('The password must be at most 16 characters long')
+        if password.isalpha():
+            raise ValueError('The password must contain at least one number')
+        if password.isnumeric():
+            raise ValueError('The password must contain at least one letter')
 
         try:
             validate_international_phonenumber(phone_number)

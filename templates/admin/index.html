@@ -1,0 +1,161 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .stat-card {
+        border-radius: 16px;
+        padding: 25px 20px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+    }
+
+    .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .stat-label {
+        font-size: 15px;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .col-md-3 {
+        flex: 1 1 calc(25% - 20px);
+        min-width: 250px;
+    }
+
+    /* Card Color Themes */
+    .bg-primary { background: #007bff; }
+    .bg-danger { background: #dc3545; }
+    .bg-success { background: #28a745; }
+    .bg-warning { background: #ffc107; color: black; }
+    .bg-brown { background: #ad9651; color: black; }
+    .bg-sky { background: #00aeff; color: black; }
+    .bg-purple { background: #8d0063; }
+    .bg-faded { background: #94207142; color: white; }
+</style>
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="stat-card bg-primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number" data-value="{{ total_users }}">0</div>
+            <div class="stat-label">Ishchilar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-danger">
+            <div class="stat-icon">📥</div>
+            <div class="stat-number" data-value="{{ total_leads }}">0</div>
+            <div class="stat-label">Leadlar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-success">
+            <div class="stat-icon">🆕</div>
+            <div class="stat-number" data-value="{{ new_leads_today }}">0</div>
+            <div class="stat-label">Bugungi leadlar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-warning">
+            <div class="stat-icon">✅</div>
+            <div class="stat-number" data-value="{{ active_customers }}">0</div>
+            <div class="stat-label">Aktiv mijozlar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-brown">
+            <div class="stat-icon">📅</div>
+            <div class="stat-number" data-value="{{ new_meetings_today }}">0</div>
+            <div class="stat-label">Bugungi uchrashuvlar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-sky">
+            <div class="stat-icon">📌</div>
+            <div class="stat-number" data-value="{{ tasks_to_do }}">0</div>
+            <div class="stat-label">Tasklar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-purple">
+            <div class="stat-icon">💼</div>
+            <div class="stat-number" data-value="{{ deals }}">0</div>
+            <div class="stat-label">Bitimlar</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-faded">
+            <div class="stat-icon">📞</div>
+            <div class="stat-number" data-value="{{ interactions_today }}">0</div>
+            <div class="stat-label">Bugungi interactionlar</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const duration = 1500;
+
+        const easeOutQuad = t => t * (2 - t); // smoother animation
+
+        document.querySelectorAll('.stat-number').forEach(stat => {
+            const target = parseInt(stat.getAttribute("data-value")) || 0;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = easeOutQuad(progress);
+                const value = Math.floor(eased * target);
+                stat.textContent = value.toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    stat.textContent = target.toLocaleString();
+                }
+            }
+
+            requestAnimationFrame(update);
+        });
+    });
+</script>
+{% endblock %}

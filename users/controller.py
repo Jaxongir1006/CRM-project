@@ -10,7 +10,7 @@ from ninja_jwt.tokens import RefreshToken
 from ninja_extra.permissions import IsAuthenticated
 from ninja_jwt.authentication import JWTAuth
 from utils.permissions import IsAdmin
-
+import jazzmin
 
 @api_controller("/user", tags=["Register and Login"])
 class UserController:
