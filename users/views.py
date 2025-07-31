@@ -13,7 +13,7 @@ from interaction.models import Interaction
 @staff_member_required
 def custom_admin_index(request):
     context = {
-        **site.each_context(request),
+        **site.each_context(),
         "total_users": User.objects.count(),
         "total_leads": Lead.objects.count(),
         "new_leads_today": Lead.objects.filter(created_at__date=now().date()).count(),
@@ -24,3 +24,7 @@ def custom_admin_index(request):
         "interactions_today":Interaction.objects.filter(next_action_date=now().date()).count(),
     }
     return TemplateResponse(request, "admin/index.html", context)
+
+
+def home(request):
+    return TemplateResponse(request, '404.html')

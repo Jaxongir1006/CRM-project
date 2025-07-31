@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback-key-if-not-set")
+SECRET_KEY = 'django-insecure-e18!3$f3z(+ru@)huqti)v(+93adgm$p&+@ihfphc2g_ezc$j2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_celery_beat',
+    'redis',
+    'celery',
     "users",
     "ninja",
     "ninja_extra",
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
     'tasks',
     'lead',
     'interaction',
+    'reminders',
 ]
 
 MIDDLEWARE = [
@@ -86,6 +90,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "crm_project.wsgi.application"
 
 
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_BEAT_SCHEDULER = os.getenv('CELERY_BEAT_SCHEDULER')
+
+
 
 NINJA_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
@@ -109,9 +120,13 @@ JAZZMIN_SETTINGS = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': os.environ.get("SQL_ENGINE"),
+        'NAME': os.environ.get("SQL_DATABASE"),
+        'USER': os.environ.get("SQL_USER"),
+        'PASSWORD': os.environ.get("SQL_PASSWORD"),
+        'HOST': os.environ.get("SQL_HOST"),
+        'PORT': os.environ.get("SQL_PORT"),
     }
 }
 
@@ -151,9 +166,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATIC_ROOT = BASE_DIR / 'static'
 
 
 

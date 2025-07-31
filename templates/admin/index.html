@@ -1,7 +1,20 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
+{% block content_title %}
+    
+{% endblock %}
+
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">Home</a> › Dashboard
+    </div>
+{% endblock %}
+
+
 {% block content %}
+
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -129,6 +142,7 @@
         </div>
     </div>
 </div>
+{{ block.super }}   
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {

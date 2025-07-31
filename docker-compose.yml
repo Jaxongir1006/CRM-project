@@ -1,0 +1,63 @@
+services:
+  web:
+    build: .
+    container_name: django_app
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn crm_project.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - db_crm  
+      - redis
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    container_name: redis
+
+  db_crm:
+    image: postgres:16.0-alpine
+    restart: always
+    container_name: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=crm_db
+      - POSTGRES_USER=crm_user
+      - POSTGRES_PASSWORD=crm_pass
+
+  celery:
+    build: .
+    container_name: celery
+    command: celery -A crm_project worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    env_file:
+      - .env
+
+  celery-beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A crm_project beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:

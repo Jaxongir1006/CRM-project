@@ -20,10 +20,11 @@ from django.urls import path
 from api import api
 from django.conf import settings
 from django.conf.urls.static import static
-from users.views import custom_admin_index
+from users.views import custom_admin_index, home
 
 
 urlpatterns = [
+    path('', home, name='home'),
     path("admin/", custom_admin_index, name="custom_admin_index"),
     path("admin/", admin.site.urls),
     path('api/', api.urls)
