@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -95,6 +96,22 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
 CELERY_BEAT_SCHEDULER = os.getenv('CELERY_BEAT_SCHEDULER')
+
+CELERY_BEAT_SCHEDULE = {
+    'check-due-reminders-every-minute': {
+        'task': 'reminders.tasks.check_due_reminders',
+        'schedule': crontab(minute='*/1'),  # Har 1 daqiqada
+    },
+}
+
+
+EMAIL_BACKEND=os.getenv('EMAIL_BACKEND')
+EMAIL_HOST=os.getenv('EMAIL_HOST')
+EMAIL_PORT=os.getenv('EMAIL_PORT')
+EMAIL_USE_TLS=os.getenv('EMAIL_USE_TLS')
+EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
+ADMIN_EMAIL=os.getenv('ADMIN_EMAIL')
 
 
 

@@ -13,7 +13,7 @@ from interaction.models import Interaction
 @staff_member_required
 def custom_admin_index(request):
     context = {
-        **site.each_context(),
+        **site.each_context(request),
         "total_users": User.objects.count(),
         "total_leads": Lead.objects.count(),
         "new_leads_today": Lead.objects.filter(created_at__date=now().date()).count(),
