@@ -91,6 +91,48 @@ TEMPLATES = [
 WSGI_APPLICATION = "crm_project.wsgi.application"
 
 
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} - {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "timed_file": {
+            "level": "INFO",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": LOG_DIR / "app.log",
+            "when": "midnight",           # Har kechasi 00:00 da yangi log
+            "interval": 1,
+            "backupCount": 7,             # Maksimal 7 kunlik log saqlanadi
+            "formatter": "verbose",
+            "encoding": "utf-8",
+        },
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["timed_file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "yourapp": {  # Bu yerga o‘z app nomingni yoz
+            "handlers": ["timed_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -123,6 +165,12 @@ NINJA_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
+NINJA_EXTRA_SETTINGS = {
+    "DEFAULT_THROTTLE_CLASSES": [
+        "crm_project.throttles.SimpleRateThrottle",  # to‘liq path
+    ]
+}
+
 
 JAZZMIN_SETTINGS = {
     "site_title": "CRM",
@@ -132,6 +180,19 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "custom_css": "css/custom.css",
 }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis-test:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}   
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

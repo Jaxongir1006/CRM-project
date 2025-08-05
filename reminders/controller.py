@@ -6,6 +6,9 @@ from .schemas import ReminderSchema, CreateReminderSchema, ErrorSchema, UpdateRe
 from ninja_jwt.authentication import JWTAuth
 from customers.models import Customer
 from typing import List
+import logging
+
+logger = logging.getLogger('__name__')
 
 @api_controller('/reminder', auth=JWTAuth(), permissions=[IsAuthenticated])
 class ReminderController:
@@ -30,6 +33,7 @@ class ReminderController:
         data['customer'] = customer
         data.pop('customer_mail')
         reminder = Reminder.objects.create(**data)
+        logger.info(f"The new reminder created by {user}")
         return 201, reminder
     
     @http_put('/update/{reminder_id}/', response={200: ReminderSchema, 404: ErrorSchema, 400: ErrorSchema}, permissions=[IsAdminManagerSales])
@@ -38,12 +42,15 @@ class ReminderController:
         try:
             reminder = Reminder.objects.get(id=reminder_id)
         except Reminder.DoesNotExist:
+            logger.error(f"'{user}' This user tried to update reminder with fake id")
             return 404, {"error":"Reminder with this id does not exist or has been deleted"}
         if user != reminder.user or user.role != 'admin':
+            logger.error(f"{user} This user tried to update the reminder, which does not belong to him/her")
             return 400, {"error": "You are not the one who created this reminder or you are not admin, so you cannot change or delete this reminder"}
         
         for key, value in data.model_dump(exclude_unset=True).items():
             setattr(reminder, key, value)
+        logger.info(f"'{reminder}' This reminder has been updated by {user}")
         reminder.save()
         return 200, reminder
 
@@ -54,6 +61,7 @@ class ReminderController:
         try:
             reminder = Reminder.objects.get(id=reminder_id)
         except Reminder.DoesNotExist:
+            logger.error(f"'{user}' This user tried to update reminder with fake id")
             return 404, {"error":"reminder with this id does not exist or has been deleted"}
             
         if user.role != 'admin' or user != reminder.user:

@@ -14,7 +14,9 @@ from utils.permissions import IsAdminManagerSales
 from ninja_jwt.authentication import JWTAuth
 from typing import List
 from customers.models import Customer
+import logging
 
+logger = logging.getLogger("__name__")
 
 @api_controller("/tasks", auth=JWTAuth(), permissions=[IsAuthenticated], tags=["Tasks"])
 class TaskController:
@@ -30,7 +32,9 @@ class TaskController:
         try:
             task = Task.objects.create(**data)
         except Exception as e:
+            logger.error(f"{e}")
             return 400, {"error": str(e)}
+        logger.info(f"'{task.title}' The task created by {user}")
         return 201, task
 
     @http_get("/", response=List[TaskSchema])
@@ -42,8 +46,8 @@ class TaskController:
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
+            logger.error(f"'{request.user}' This user tried to get task with fake id")
             return 404, {"error": "Task not found"}
-
         return task
 
     @http_put(
@@ -55,10 +59,12 @@ class TaskController:
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
+            logger.error(f"'{request.user}' This user tried to update task with fake id")
             return 404, {"error": "Task not found"}
 
         for key, value in data.model_dump(exclude_unset=True).items():
             setattr(task, key, value)
+        logger.info(f"'{task.title}' This task has been updated by {request.user}")
         task.save()
         return task
 
@@ -71,7 +77,9 @@ class TaskController:
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
+            logger.error(f"'{request.user}' This user tried to delete task with fake id")
             return 404, {"error": "Task not found"}
+        logger.info(f"'{task.title}' This task has been deleted by {request.user}")
         task.delete()
         return 200, {"message": "The task has been deleted"}
 
@@ -95,7 +103,9 @@ class MeetingController:
         try:
             meeting = Meeting.objects.create(**data)
         except Exception as e:
+            logger.exception(f'{e}')
             return 400, {"error", str(e)}
+        logger.info(f"New meeting created by {request.user} for {customer.name}")
         return 201, meeting
 
     @http_get("/", response=List[MeetingSchema])
@@ -107,6 +117,7 @@ class MeetingController:
         try:
             meeting = Meeting.objects.get(id=meeting_id)
         except Meeting.DoesNotExist:
+            logger.error(f"'{request.user}' This user tried to get meeting with fake id")
             return 404, {"error": "Meeting not found"}
         return 200, meeting
 
@@ -120,12 +131,13 @@ class MeetingController:
         try:
             meeting = Meeting.objects.get(id=meeting_id)
         except Meeting.DoesNotExist:
+            logger.error(f"'{request.user}' This user tried to update meeting with fake id")
             return 404, {"error":"Meeting with this id does not exist"}
          
         for key, value in data.model_dump(exclude_unset=True).items():
             setattr(meeting, key, value)
         meeting.save()
-
+        logger.info(f"One meeting has been updated by {request.user}")
         return 200, meeting
     
     @http_delete("/delete/{meeting_id}/", response={200: dict, 404: ErrorSchema}, permissions=[IsAdminManagerSales])
@@ -133,7 +145,8 @@ class MeetingController:
         try:
             meeting = Meeting.objects.get(id=meeting_id)
         except Meeting.DoesNotExist:
+            logger.error(f"'{request.user}' This user tried to delete meeting with fake id")
             return 404, {"error":"Meeting with this id does not exist"}
-        
+        logger.info(f"The meeting on {meeting.datetime} has been deleted by {request.user}")
         meeting.delete()
         return 200, {"message":"The meeting has been deleted"}

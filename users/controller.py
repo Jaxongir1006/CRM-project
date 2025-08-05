@@ -10,6 +10,9 @@ from ninja_jwt.tokens import RefreshToken
 from ninja_extra.permissions import IsAuthenticated
 from ninja_jwt.authentication import JWTAuth
 from utils.permissions import IsAdmin
+import logging
+
+logger = logging.getLogger("__name__")
 
 @api_controller("/user", tags=["Register and Login"])
 class UserController:
@@ -29,9 +32,11 @@ class UserController:
         data.pop("confirm_password")
         try:
             user = CustomUser.objects.create_user(**data)
+            logger.info(f"New worker created named {user} by {request.user}")
         except Exception as e:
+            logger.error(f'{str(e)}')
             return 400, {"error": str(e)}
-
+        
         return 201, {
             "message": "New user created",
             "user": CustomUserSchema.from_orm(user),
@@ -42,6 +47,7 @@ class UserController:
         data = data.model_dump(exclude_unset=True)
         user = CustomUser.objects.login_user(**data)
         if not user:
+            logger.error('Invalid credentials')
             return 400, {"error": "Invalid credentials"}
 
         token = RefreshToken.for_user(user)

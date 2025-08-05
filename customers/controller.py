@@ -11,6 +11,9 @@ from .schemas import (
 from typing import List
 from ninja_extra.permissions import IsAuthenticated
 from django.db.models import Q
+import logging
+
+logger = logging.getLogger("__name__")
 
 @api_controller("/customers", auth=JWTAuth())
 class CustomerController:
@@ -27,6 +30,7 @@ class CustomerController:
                 **data.model_dump(exclude_unset=True), user=user
             )
         except Exception as e:
+            logger.exception(f"{e}")
             return 400, {"error": str(e)}
 
         return 201, customer

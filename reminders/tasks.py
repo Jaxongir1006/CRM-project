@@ -29,6 +29,5 @@ def check_due_reminders():
         msg = EmailMultiAlternatives(subject, '', from_email, [to_email])
         msg.attach_alternative(html_content, 'text/html')
         msg.send()
-        print("jalab borgan bolishi kere zb boru")
         reminder.is_sent = True
         reminder.save()
